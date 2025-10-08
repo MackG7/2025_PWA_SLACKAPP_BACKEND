@@ -31,13 +31,23 @@ connectMongoDB();
 
 const app = express()
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://2025-pwa-slackapp-frontend.vercel.app",
+];
+
+// app.use(cors());
+
 app.use(cors({
-  origin: "http://localhost:5173", // tu frontend
-  credentials: true,               // si usas cookies o auth
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
 }));
-
-app.use(express.json())
-
 app.use('/api/workspace', workspace_router)
 app.use('/api/auth', auth_router)
 
