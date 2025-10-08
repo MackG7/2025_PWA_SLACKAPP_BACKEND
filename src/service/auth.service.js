@@ -41,7 +41,7 @@ class AuthService {
         })
     }
 
-    static async verifyEmail(verification_token){
+    static async verifyEmail(verification_token) {
         try {
             const payload = jwt.verify(verification_token, ENVIRONMENT.JWT_SECRET_KEY)
 
@@ -63,7 +63,7 @@ class AuthService {
         }
     }
 
-    static async login(email, password){
+    static async login(email, password) {
         /* 
         - Buscar por email y guardar en una variable
             - No se encontro: Tiramos error 404 'Email no registrado' / 'El email o la contraseña son invalidos'
@@ -76,6 +76,9 @@ class AuthService {
         const user = await UserRepository.getByEmail(email)
         if (!user) {
             throw new ServerError(404, 'Email no registrado')
+        }
+        if (user.verified_email === false) {
+            throw new ServerError(401, 'Email no verificado')
         }
         /* Permite saber si cierto valor es igual a otro cierto valor encriptado */
         const is_same_password = await bcryptjs.compare(password, user.password)
